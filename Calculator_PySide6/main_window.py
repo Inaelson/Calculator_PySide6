@@ -1,4 +1,7 @@
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (QMainWindow, QVBoxLayout,
+                               QWidget, QLabel, QLineEdit,)
+from PySide6.QtCore import Qt
+from variables import BIG_FONT_SIZE, TEXT_MARGIN, MINIMUN_WIDTH
 
 
 class MainWindow(QMainWindow):
@@ -20,4 +23,27 @@ class MainWindow(QMainWindow):
 
     def addWidgetToVlayout(self, widget: QWidget):
         self.vLayout.addWidget(widget)
-        self.adjustFixedSize()
+
+
+class Info(QLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.configStyle()
+
+    def configStyle(self):
+        self.setStyleSheet('font-size: 15px')
+        self.setAlignment(Qt.AlignmentFlag.AlignRight)
+
+
+class Display(QLineEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.configStyle()
+
+    def configStyle(self):
+        margins = [TEXT_MARGIN for _ in range(4)]
+        self.setStyleSheet(f'font-size:{BIG_FONT_SIZE}px;')
+        self.setMinimumHeight(BIG_FONT_SIZE * 2)
+        self.setMinimumWidth(MINIMUN_WIDTH)
+        self.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.setTextMargins(*margins)
