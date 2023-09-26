@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
-from main_window import MainWindow, Info, Display
+from widgets import MainWindow, Info, Display, ButtonsGrid
 from variables import WINDOW_ICON_PATH, setupTheme
 
 if __name__ == '__main__':
@@ -13,12 +13,16 @@ if __name__ == '__main__':
     app.setWindowIcon(icon)
 
     # Info
-    info = Info('25.0 * 35.5')
+    info = Info()
     window.addWidgetToVlayout(info)
 
     # Display
     display = Display()
     window.addWidgetToVlayout(display)
+
+    # Grid
+    buttonsgrid = ButtonsGrid(display, info)
+    window.vLayout.addLayout(buttonsgrid)
 
     # Execute all
     window.adjustFixedSize()
