@@ -21,7 +21,7 @@ if __name__ == '__main__':
     window.addWidgetToVlayout(display)
 
     # Grid
-    buttonsgrid = ButtonsGrid(display, info)
+    buttonsgrid = ButtonsGrid(display, info, window)
     window.vLayout.addLayout(buttonsgrid)
 
     # Execute all

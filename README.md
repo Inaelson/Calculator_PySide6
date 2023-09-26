@@ -11,3 +11,7 @@ Update (26/09/2023):
     - Added Grid layout and set all theme.
     - Increase display funcionalities
     - Fixed bugs unitl here.
+    - Added 'pow' function
+    - Added 'Backspace'
+    - Added show expression result
+    - Added Error window

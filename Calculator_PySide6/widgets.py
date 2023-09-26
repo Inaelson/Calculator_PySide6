@@ -1,6 +1,7 @@
+from math import pow
 from PySide6.QtWidgets import (QMainWindow, QVBoxLayout,
                                QWidget, QLabel, QLineEdit, QPushButton,
-                               QGridLayout)
+                               QGridLayout, QMessageBox)
 from PySide6.QtCore import Qt, Slot
 from variables import (BIG_FONT_SIZE, TEXT_MARGIN, MINIMUN_WIDTH,
                        MEDIUM_FONT_SIZE,)
@@ -26,6 +27,9 @@ class MainWindow(QMainWindow):
 
     def addWidgetToVlayout(self, widget: QWidget):
         self.vLayout.addWidget(widget)
+
+    def makeMsgBox(self):
+        return QMessageBox(self)
 
 
 class Info(QLabel):
@@ -63,7 +67,8 @@ class Button(QPushButton):
 
 
 class ButtonsGrid(QGridLayout):
-    def __init__(self, display: Display, info: Info, *args, **kwargs):
+    def __init__(self, display: Display, info: Info,
+                 window: MainWindow, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._gridMask = [
@@ -75,6 +80,7 @@ class ButtonsGrid(QGridLayout):
         ]
         self.display = display
         self.info = info
+        self.window = window
         self._equation = ''
         self._equationInitial = 'Your calc'
         self._left = None
@@ -115,10 +121,16 @@ class ButtonsGrid(QGridLayout):
         if text == 'C':
             self._connectButtonClicked(button, self._clear())
 
-        if text in '+-*/':
+        if text in '+-*/^':
             self._connectButtonClicked(
                 button, self._makeSlot(self._operatorClicked, button)
                 )
+
+        if text in '=':
+            self._connectButtonClicked(button, self._eq)
+
+        if text in '◀':
+            self._connectButtonClicked(button, self.display.backspace)
 
     def _makeSlot(self, function, *args, **kwargs):
         @Slot(bool)
@@ -136,11 +148,13 @@ class ButtonsGrid(QGridLayout):
         self.display.insert(buttonText)
 
     def _clear(self):
-        self._left = None
-        self._right = None
-        self._operator = None
-        self.equation = self._equationInitial
-        self.display.clear()
+        def inner():
+            self._left = None
+            self._right = None
+            self._operator = None
+            self.equation = self._equationInitial
+            self.display.clear()
+        return inner
 
     def _operatorClicked(self, button):
         buttonText = button.text()
@@ -148,6 +162,7 @@ class ButtonsGrid(QGridLayout):
         self.display.clear()
 
         if not isValidNumber(displayText) and self._left is None:
+            self._showError('Você não digitou nada!')
             return
 
         if self._left is None:
@@ -155,3 +170,42 @@ class ButtonsGrid(QGridLayout):
 
         self._operator = buttonText
         self.equation = f'{self._left} {self._operator} ??'
+
+    def _eq(self):
+        displayText = self.display.text()
+
+        if not isValidNumber(displayText):
+            return
+
+        self._right = float(displayText)
+        self.equation = f'{self._left} {self._operator} {self._right}'
+        result = 'error'
+
+        try:
+            if '^' in self.equation and isinstance(self._left, float):
+                result = pow(self._left, self._right)
+            else:
+                result = eval(self.equation)
+        except ZeroDivisionError:
+            result = 'error'
+        except OverflowError:
+            result = 'error'
+
+        self.display.clear()
+        self.info.setText(f'{self.equation} = {result}')
+        self._left = result
+        self._right = None
+
+        if result == 'error':
+            self._left = None
+
+    def _showError(self, text):
+        msgBox = self.window.makeMsgBox()
+        msgBox.setText(text)
+        msgBox.setIcon(msgBox.Icon.Critical)
+
+        msgBox.setStandardButtons(
+            msgBox.StandardButton.Ok
+        )
+
+        msgBox.exec()
