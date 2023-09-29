@@ -147,8 +147,8 @@ class ButtonsGrid(QGridLayout):
 
     def _makeGrid(self):
         self.display.eqPressed.connect(self._eq)
-        self.display.delPressed.connect(self.display.backspace)
-        self.display.clearPressed.connect(self._clear())
+        self.display.delPressed.connect(self._backspace)
+        self.display.clearPressed.connect(self._clear)
         self.display.inputPressed.connect(self._insertTextDisplay)
         self.display.operatorPressed.connect(self._configLeftOp)
 
@@ -171,7 +171,7 @@ class ButtonsGrid(QGridLayout):
         text = button.text()
 
         if text == 'C':
-            self._connectButtonClicked(button, self._clear())
+            self._connectButtonClicked(button, self._clear)
 
         if text in '+-*/^':
             self._connectButtonClicked(
@@ -213,16 +213,16 @@ class ButtonsGrid(QGridLayout):
             return
 
         self.display.insert(text)
+        self.display.setFocus()
 
     @Slot()
     def _clear(self):
-        def inner():
-            self._left = None
-            self._right = None
-            self._operator = None
-            self.equation = self._equationInitial
-            self.display.clear()
-        return inner
+        self._left = None
+        self._right = None
+        self._operator = None
+        self.equation = self._equationInitial
+        self.display.clear()
+        self.display.setFocus()
 
     @Slot()
     def _configLeftOp(self, text):
@@ -238,6 +238,7 @@ class ButtonsGrid(QGridLayout):
 
         self._operator = text
         self.equation = f'{self._left} {self._operator} ??'
+        self.display.setFocus()
 
     @Slot()
     def _eq(self):
@@ -264,9 +265,15 @@ class ButtonsGrid(QGridLayout):
         self.info.setText(f'{self.equation} = {result}')
         self._left = result
         self._right = None
+        self.display.setFocus()
 
         if result == 'error':
             self._left = None
+
+    @Slot()
+    def _backspace(self):
+        self.display.backspace()
+        self.display.setFocus()
 
     def _makeDialog(self, text):
         msgBox = self.window.makeMsgBox()
@@ -278,8 +285,10 @@ class ButtonsGrid(QGridLayout):
         msgBox = self._makeDialog(text)
         msgBox.setIcon(msgBox.Icon.Critical)
         msgBox.exec()
+        self.display.setFocus()
 
     def _showInfo(self, text):
         msgBox = self._makeDialog(text)
         msgBox.setIcon(msgBox.Icon.Information)
         msgBox.exec()
+        self.display.setFocus()

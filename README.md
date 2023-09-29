@@ -3,6 +3,11 @@
 build in python using the PySide6 library,
 this a project for testing me as a begginer developer.
 
+Update (29/09/2023):
+
+    - Fixed Display Focus
+    - Added function '_backspace' to the grid
+
 
 Update (28/09/2023):
 
