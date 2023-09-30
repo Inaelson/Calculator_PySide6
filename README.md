@@ -5,6 +5,7 @@ this a project for testing me as a begginer developer.
 
 Update (29/09/2023):
     
+    - Added Requirements.txt
     - Fixed Display Focus
     - Added function '_backspace' to the grid
 
