@@ -204,6 +204,7 @@ class ButtonsGrid(QGridLayout):
 
         newNumber = -float(displayText)
         self.display.setText(str(newNumber))
+        self.display.setFocus()
 
     @Slot()
     def _insertTextDisplay(self, text):
